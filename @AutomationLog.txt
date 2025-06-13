@@ -1,0 +1,4 @@
+2024-09-24 10:44:08.151 wehchatAuto.py[13] <module> -> Find Control Timeout(10s): {Name: '微信', ControlType: WindowControl}
+2024-09-24 11:09:12.608 wehchatAuto.py[13] <module> -> Find Control Timeout(10s): {Name: '微信', ControlType: WindowControl}
+2024-09-24 11:13:32.720 wehchatAuto.py[13] <module> -> Find Control Timeout(10s): {Name: '微信', ControlType: WindowControl}
+2024-09-24 11:21:25.179 wehchatAuto.py[13] <module> -> Find Control Timeout(10s): {Name: '微信', ControlType: WindowControl}
