@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub项目上传详细指南</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #238636;
+            --secondary: #1f6feb;
+            --dark: #0d1117;
+            --light: #f0f6fc;
+            --border: #30363d;
+            --terminal-bg: #161b22;
+            --success: #3fb950;
+            --warning: #d29922;
+            --error: #f85149;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0d1117, #161b22);
+            color: #c9d1d9;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            color: var(--light);
+            background: linear-gradient(to right, #3fb950, #1f6feb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(31, 111, 235, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: #8b949e;
+        }
+        
+        .github-logo {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            color: var(--light);
+            text-shadow: 0 0 20px rgba(31, 111, 235, 0.5);
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(31, 111, 235, 0.2);
+            border-color: var(--secondary);
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .card-title {
+            font-size: 1.6rem;
+            color: var(--light);
+        }
+        
+        .card-content {
+            margin-bottom: 20px;
+        }
+        
+        .card-content p {
+            margin-bottom: 15px;
+        }
+        
+        .terminal {
+            background: var(--terminal-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.95rem;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+        
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #8b949e;
+            font-size: 0.9rem;
+        }
+        
+        .terminal-content {
+            line-height: 1.8;
+        }
+        
+        .terminal-line {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .prompt {
+            color: var(--success);
+            margin-right: 10px;
+            user-select: none;
+        }
+        
+        .command {
+            color: var(--light);
+            flex-grow: 1;
+        }
+        
+        .comment {
+            color: #8b949e;
+            font-style: italic;
+            margin-left: 10px;
+        }
+        
+        .output {
+            color: #8b949e;
+            margin-left: 30px;
+        }
+        
+        .note {
+            background: rgba(35, 134, 54, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .warning {
+            background: rgba(210, 153, 34, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .error {
+            background: rgba(248, 81, 73, 0.1);
+            border-left: 4px solid var(--error);
+        }
+        
+        .screenshot {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin: 20px 0;
+            background: linear-gradient(45deg, #0d1117, #161b22);
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8b949e;
+            font-size: 1.2rem;
+        }
+        
+        .screenshot i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .resources {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        .resources h2 {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            color: var(--light);
+            text-align: center;
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .resource-card {
+            background: rgba(13, 17, 23, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .resource-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .resource-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .resource-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+        
+        .resource-desc {
+            color: #8b949e;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .resource-link {
+            display: inline-block;
+            padding: 8px 20px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .resource-link:hover {
+            background: #2ea043;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: #8b949e;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="github-logo">
+                <i class="fab fa-github"></i>
+            </div>
+            <h1>GitHub项目上传详细指南</h1>
+            <p class="subtitle">从零开始学习如何将本地项目推送到GitHub仓库 - 包含详细步骤、终端命令和可视化演示</p>
+        </header>
+        
+        <div class="cards-container">
+            <!-- 步骤 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-number">1</div>
+                    <h2 class="card-title">安装Git</h2>
+                </div>
+                <div class="card-content">
+                    <p>Git是版本控制系统的核心工具，用于跟踪代码变更并与GitHub交互。</p>
+                    
+                    <div class="screenshot">
+                        <div>
+                            <i class="fas fa-download"></i>
+                            <p>Git安装界面截图</p>
+                        </div>
+                    </div>
+                    
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <span>验证Git安装</span>
+                            <span>Terminal</span>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git --version</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">git version 2.37.1</span>
+                                <span class="comment"># 显示安装的Git版本</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note">
+                        <strong>注意：</strong> 安装完成后，在终端输入 <code>git --version</code> 验证安装是否成功。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-number">2</div>
+                    <h2 class="card-title">配置Git</h2>
+                </div>
+                <div class="card-content">
+                    <p>设置你的用户名和邮箱，这些信息将关联到你的每一次代码提交。</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <span>设置用户信息</span>
+                            <span>Terminal</span>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git config --global user.name "Your Name"</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git config --global user.email "your.email@example.com"</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git config --list</span>
+                                <span class="comment"># 查看所有配置</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note warning">
+                        <strong>重要：</strong> 使用你在GitHub注册时使用的邮箱地址，这样你的提交才会关联到你的GitHub账号。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤 3 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-number">3</div>
+                    <h2 class="card-title">初始化本地仓库</h2>
+                </div>
+                <div class="card-content">
+                    <p>导航到你的项目目录并初始化Git仓库。</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <span>初始化仓库</span>
+                            <span>Terminal</span>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">cd /path/to/your/project</span>
+                                <span class="comment"># 进入项目目录</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git init</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Initialized empty Git repository in /your/project/.git/</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">ls -a</span>
+                                <span class="comment"># 查看隐藏的.git目录</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note">
+                        <strong>提示：</strong> 这会创建一个隐藏的 <code>.git</code> 目录，包含Git的所有版本控制信息。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤 4 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-number">4</div>
+                    <h2 class="card-title">添加文件到暂存区</h2>
+                </div>
+                <div class="card-content">
+                    <p>选择要添加到版本控制的文件，准备进行提交。</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <span>添加文件</span>
+                            <span>Terminal</span>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git status</span>
+                                <span class="comment"># 查看当前状态</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Untracked files: index.html, styles.css, app.js</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git add .</span>
+                                <span class="comment"># 添加所有文件</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git add index.html</span>
+                                <span class="comment"># 添加单个文件</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note">
+                        <strong>说明：</strong> 
+                        <ul>
+                            <li><code>git add .</code> - 添加所有文件</li>
+                            <li><code>git add filename</code> - 添加特定文件</li>
+                            <li><code>git add *.js</code> - 添加所有JS文件</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤 5 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-number">5</div>
+                    <h2 class="card-title">提交更改</h2>
+                </div>
+                <div class="card-content">
+                    <p>将暂存区的文件提交到本地仓库，并添加有意义的提交信息。</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <span>提交更改</span>
+                            <span>Terminal</span>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git commit -m "Initial commit"</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">[main (root-commit) a1b2c3d] Initial commit</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output"> 3 files changed, 100 insertions(+)</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output"> create mode 100644 index.html</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note warning">
+                        <strong>最佳实践：</strong> 提交信息应简洁明了，说明本次提交的目的和内容变化。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤 6 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-number">6</div>
+                    <h2 class="card-title">创建GitHub仓库</h2>
+                </div>
+                <div class="card-content">
+                    <p>在GitHub网站上创建新的远程仓库。</p>
+                    
+                    <div class="screenshot">
+                        <div>
+                            <i class="fas fa-plus-circle"></i>
+                            <p>GitHub创建仓库界面</p>
+                        </div>
+                    </div>
+                    
+                    <ol>
+                        <li>登录GitHub账号</li>
+                        <li>点击右上角 "+" 图标</li>
+                        <li>选择 "New repository"</li>
+                        <li>输入仓库名称（建议与项目目录同名）</li>
+                        <li>添加描述（可选）</li>
+                        <li>选择公开（Public）或私有（Private）</li>
+                        <li><strong>不要</strong>初始化README、.gitignore或license文件</li>
+                        <li>点击 "Create repository"</li>
+                    </ol>
+                    
+                    <div class="note error">
+                        <strong>注意：</strong> 不要勾选任何初始化选项，因为我们已经有了本地仓库。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤 7 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-number">7</div>
+                    <h2 class="card-title">添加远程仓库</h2>
+                </div>
+                <div class="card-content">
+                    <p>将GitHub仓库添加为本地仓库的远程源。</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <span>添加远程仓库</span>
+                            <span>Terminal</span>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git remote add origin https://github.com/username/repo-name.git</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git remote -v</span>
+                                <span class="comment"># 验证远程仓库</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">origin  https://github.com/username/repo-name.git (fetch)</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">origin  https://github.com/username/repo-name.git (push)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note">
+                        <strong>说明：</strong> 
+                        <ul>
+                            <li>"origin" 是远程仓库的默认名称</li>
+                            <li>URL可以在GitHub仓库页面找到</li>
+                            <li>使用SSH URL（git@github.com:...）需要配置SSH密钥</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤 8 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="step-number">8</div>
+                    <h2 class="card-title">推送到GitHub</h2>
+                </div>
+                <div class="card-content">
+                    <p>将本地提交推送到GitHub远程仓库。</p>
+                    
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <span>推送代码</span>
+                            <span>Terminal</span>
+                        </div>
+                        <div class="terminal-content">
+                            <div class="terminal-line">
+                                <span class="prompt">$</span>
+                                <span class="command">git push -u origin main</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Enumerating objects: 5, done.</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Counting objects: 100% (5/5), done.</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Delta compression using up to 8 threads</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Compressing objects: 100% (3/3), done.</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Writing objects: 100% (5/5), 1.23 KiB | 1.23 MiB/s, done.</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Total 5 (delta 0), reused 0 (delta 0)</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">To https://github.com/username/repo-name.git</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output"> * [new branch]      main -> main</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="output">Branch 'main' set up to track remote branch 'main' from 'origin'.</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="note">
+                        <strong>说明：</strong> 
+                        <ul>
+                            <li><code>-u</code> 参数设置上游分支，以后可以直接使用 <code>git push</code></li>
+                            <li>第一次推送可能需要GitHub身份验证</li>
+                            <li>推送成功后刷新GitHub仓库页面查看代码</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="resources">
+            <h2><i class="fas fa-toolbox"></i> 资源和工具</h2>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fab fa-git-alt"></i>
+                    </div>
+                    <h3 class="resource-title">Git下载</h3>
+                    <p class="resource-desc">官方Git安装程序，支持Windows、macOS和Linux</p>
+                    <a href="https://git-scm.com/downloads" class="resource-link">下载Git</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fab fa-github"></i>
+                    </div>
+                    <h3 class="resource-title">GitHub注册</h3>
+                    <p class="resource-desc">创建免费GitHub账号，开始托管你的代码</p>
+                    <a href="https://github.com/signup" class="resource-link">注册账号</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <h3 class="resource-title">Git文档</h3>
+                    <p class="resource-desc">官方Git文档，学习所有Git命令和概念</p>
+                    <a href="https://git-scm.com/doc" class="resource-link">查看文档</a>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3 class="resource-title">Git学习资源</h3>
+                    <p class="resource-desc">交互式Git教程和练习平台</p>
+                    <a href="https://learngitbranching.js.org" class="resource-link">开始学习</a>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 GitHub项目上传指南 | 本指南提供详细的Git和GitHub使用说明</p>
+            <p>在实际操作中遇到问题？请参考官方文档或社区支持</p>
+        </footer>
+    </div>
+</body>
+</html>
