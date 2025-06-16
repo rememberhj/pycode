@@ -1,2 +1,2 @@
 # pycode
-a applicate tool ,file is 0611py.py
+a compare tool ,file is 0611py.py
